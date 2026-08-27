@@ -17,6 +17,20 @@
 
 要求：OpenClaw ≥ 2026.7.1，Node 22+。
 
+**通过 npm 安装（推荐）** —— 让任意 AI agent 帮你执行，或手动：
+
+```bash
+npx -y openclaw-imessage-photon-cli@latest install
+```
+
+或直接安装插件包：
+
+```bash
+openclaw plugins install npm:openclaw-imessage-photon
+```
+
+**从源码安装：**
+
 ```bash
 git clone https://github.com/ethanjtch/openclaw-imessage-photon
 cd openclaw-imessage-photon

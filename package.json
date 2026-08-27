@@ -11,6 +11,15 @@
     "url": "https://github.com/ethanjtch/openclaw-imessage-photon.git"
   },
   "homepage": "https://github.com/ethanjtch/openclaw-imessage-photon#readme",
+  "files": [
+    "dist/",
+    "README.md",
+    "README.zh-CN.md",
+    "openclaw.plugin.json"
+  ],
+  "engines": {
+    "node": ">=22"
+  },
   "openclaw": {
     "extensions": ["./dist/index.js"],
     "setupEntry": "./dist/setup-entry.js",
@@ -31,7 +40,8 @@
     "typescript": "^5"
   },
   "scripts": {
-    "build": "tsc -p tsconfig.build.json"
+    "build": "tsc -p tsconfig.build.json",
+    "prepublishOnly": "npm run build"
   },
   "peerDependencies": {
     "openclaw": "*"

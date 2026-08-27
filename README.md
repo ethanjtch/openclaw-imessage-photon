@@ -28,8 +28,20 @@ agent processes).
 
 Requirements: OpenClaw ≥ 2026.7.1, Node 22+.
 
+**Via npm (recommended)** — either ask an AI agent to run it, or:
+
 ```bash
-git clone https://github.com/<you>/openclaw-imessage-photon
+npx -y openclaw-imessage-photon-cli@latest install
+```
+
+Or install the plugin package directly:
+
+```bash
+openclaw plugins install npm:openclaw-imessage-photon
+```
+
+**From source:**
+git clone https://github.com/ethanjtch/openclaw-imessage-photon
 cd openclaw-imessage-photon
 npm install
 npm run build
