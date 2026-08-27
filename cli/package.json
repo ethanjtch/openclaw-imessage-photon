@@ -1,0 +1,23 @@
+{
+  "name": "openclaw-imessage-photon-cli",
+  "version": "0.1.0",
+  "description": "Lightweight installer for the OpenClaw iMessage (Photon) channel plugin — npx install + credential setup.",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["openclaw", "imessage", "photon", "spectrum", "installer", "cli"],
+  "author": "ethanjtch",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ethanjtch/openclaw-imessage-photon.git"
+  },
+  "homepage": "https://github.com/ethanjtch/openclaw-imessage-photon#readme",
+  "bin": {
+    "imessage-photon-installer": "cli.mjs"
+  },
+  "files": ["cli.mjs", "README.md"],
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {},
+  "scripts": {}
+}
