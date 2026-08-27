@@ -20,11 +20,13 @@
   - [ ] read receipts `enableReadReceipts`（spectrum-ts 原生 message.read()）（可选）
 - [ ] **photonDoctor：不做**（用 openclaw channels status + logs）
 - [ ] **device-code onboarding**：调 Photon 公开 API（app.photon.codes/api/auth/device/*）自动 provisioning，自实现（~150 行）
-- [ ] **开源准备**：
-  - [ ] README（见下方必写内容）
-  - [ ] LICENSE（MIT）
-  - [ ] 替换 src/channel.ts 中 `docsPath` 的占位链接
-  - [ ] 检查 package.json 的 name/description 等元数据
+- [x] **开源准备（初版完成）**：
+  - [x] README（对比 + 感谢 Mouxy + 功能矩阵 + 安装/配置/开发）
+  - [x] LICENSE（MIT）+ .gitignore
+  - [x] git init + 首次提交（5ec8078）
+  - [x] package.json 元数据（author/repository/homepage）
+  - [ ] 替换 `<your-github-username>` 占位 → 真实 GitHub 地址
+  - [ ] 推送 remote 到 GitHub
 
 ## README 必写内容（用户要求）
 
