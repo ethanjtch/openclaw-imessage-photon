@@ -17,27 +17,19 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: 22
-          registry-url: https://registry.npmjs.org/
 
       - name: Install & build main package
         run: |
           npm ci || npm install
           npm run build
 
-      - name: Debug OIDC user (trusted publisher identity)
-        run: npm whoami
-        env:
-          NODE_AUTH_TOKEN: ""
-
-      # npm ≥9.8.1 on GitHub Actions with id-token:write resolves credentials
-      # via OIDC against the Trusted Publisher configured on the npm package.
+      # npm ≥9.8.1 obtains an OIDC token automatically during publish and
+      # exchanges it against the Trusted Publisher configured on the npm
+      # package. No NODE_AUTH_TOKEN / .npmrc needed here.
       - name: Publish main package (openclaw-imessage-photon)
-        run: |
-          unset NODE_AUTH_TOKEN NPM_CONFIG_USERCONFIG
-          npm publish --provenance
+        run: npm publish --provenance
 
       - name: Publish CLI package (openclaw-imessage-photon-cli)
         run: |
           cd cli
-          unset NODE_AUTH_TOKEN NPM_CONFIG_USERCONFIG
           npm publish --provenance
