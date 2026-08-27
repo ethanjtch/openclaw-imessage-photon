@@ -182,7 +182,7 @@ export const imessagePhotonPlugin = createChatChannelPlugin<ResolvedAccount>({
       id: "imessage-photon",
       label: "iMessage (Photon)",
       selectionLabel: "iMessage via Photon Spectrum Cloud",
-      docsPath: "https://github.com/<your-github-username>/openclaw-imessage-photon",
+      docsPath: "https://github.com/ethanjtch/openclaw-imessage-photon",
       blurb: "iMessage through Photon Spectrum Cloud — no Mac required.",
       markdownCapable: false,
     },

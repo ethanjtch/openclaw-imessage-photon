@@ -5,12 +5,12 @@
   "type": "module",
   "license": "MIT",
   "keywords": ["openclaw", "imessage", "photon", "spectrum", "channel"],
-  "author": "<your-github-username>",
+  "author": "ethanjtch",
   "repository": {
     "type": "git",
-    "url": "https://github.com/<your-github-username>/openclaw-imessage-photon.git"
+    "url": "https://github.com/ethanjtch/openclaw-imessage-photon.git"
   },
-  "homepage": "https://github.com/<your-github-username>/openclaw-imessage-photon#readme",
+  "homepage": "https://github.com/ethanjtch/openclaw-imessage-photon#readme",
   "openclaw": {
     "extensions": ["./dist/index.js"],
     "setupEntry": "./dist/setup-entry.js",
