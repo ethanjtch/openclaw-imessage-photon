@@ -1,4 +1,5 @@
 import { readFile } from "node:fs/promises";
+import { Type } from "typebox";
 import type {
   ChannelMessageActionAdapter,
   ChannelMessageActionContext,
@@ -224,6 +225,23 @@ export function createMessageActions(): ChannelMessageActionAdapter {
         actions,
         mediaSourceParams: {
           sendAttachment: ["media", "mediaUrl", "filePath", "path", "file"],
+        },
+        // Expose the rich-link capability on send: passing url/link sends an
+        // iMessage link-preview message (PHOTON richlink). Declared here so the
+        // agent schema shows url/link fields on send.
+        schema: {
+          properties: {
+            url: Type.String({
+              description:
+                "HTTPS URL to send as a rich link-preview message (iMessage renders it as a link card). Mutually exclusive with text/markdown.",
+            }),
+            link: Type.String({
+              description:
+                "Alias for url: HTTPS URL to send as a rich link-preview message.",
+            }),
+          },
+          actions: ["send"],
+          visibility: "current-channel",
         },
       };
     },
