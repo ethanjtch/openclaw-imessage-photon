@@ -1,5 +1,7 @@
 # openclaw-imessage-photon
 
+**English** · [中文](README.zh-CN.md)
+
 iMessage channel plugin for [OpenClaw](https://github.com/contaxy/openclaw) via
 **Photon Spectrum Cloud** — no Mac, no iMessage server, no bridge process.
 
@@ -134,6 +136,19 @@ and `cp -r dist/*` there, or re-run `plugins install --force`.
   title is an empty string, crashing and dropping the event in the library
   before the plugin can see it (issue draft:
   `spectrum-ts-poll-bug-issue-draft.md`). Poll *creation* works.
+
+## Roadmap / TODO
+
+- [ ] **Message dedupe**: 48h window + restart protection (avoid duplicate
+      replies after a gateway restart)
+- [ ] **Unit tests**: config parsing / inbound classification / dedupe
+- [ ] **Device-code onboarding**: auto-login + auto-provision the Photon
+      project via Photon's public API (no manual credential copying)
+- [ ] **Group mention gating**: `requireMention` config (only reply in groups
+      when mentioned)
+- [ ] **Edit/unsend notifications**: `enableEditUnsend` switch (agent reacts
+      to inbound edit/unsend events)
+- [ ] Multi-account / remote iMessage line refinement
 
 ## License
 
