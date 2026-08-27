@@ -24,12 +24,20 @@ jobs:
           npm ci || npm install
           npm run build
 
+      - name: Debug OIDC user (trusted publisher identity)
+        run: npm whoami
+        env:
+          NODE_AUTH_TOKEN: ""
+
       # npm ≥9.8.1 on GitHub Actions with id-token:write resolves credentials
       # via OIDC against the Trusted Publisher configured on the npm package.
       - name: Publish main package (openclaw-imessage-photon)
-        run: npm publish --provenance
+        run: |
+          unset NODE_AUTH_TOKEN NPM_CONFIG_USERCONFIG
+          npm publish --provenance
 
       - name: Publish CLI package (openclaw-imessage-photon-cli)
         run: |
           cd cli
+          unset NODE_AUTH_TOKEN NPM_CONFIG_USERCONFIG
           npm publish --provenance
