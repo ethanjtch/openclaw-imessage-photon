@@ -1,10 +1,16 @@
 {
   "name": "openclaw-imessage-photon",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "iMessage channel for OpenClaw via Photon Spectrum Cloud (no Mac required).",
   "type": "module",
   "license": "MIT",
-  "keywords": ["openclaw", "imessage", "photon", "spectrum", "channel"],
+  "keywords": [
+    "openclaw",
+    "imessage",
+    "photon",
+    "spectrum",
+    "channel"
+  ],
   "author": "ethanjtch",
   "repository": {
     "type": "git",
@@ -21,7 +27,9 @@
     "node": ">=22"
   },
   "openclaw": {
-    "extensions": ["./dist/index.js"],
+    "extensions": [
+      "./dist/index.js"
+    ],
     "setupEntry": "./dist/setup-entry.js",
     "channel": {
       "id": "imessage-photon",
