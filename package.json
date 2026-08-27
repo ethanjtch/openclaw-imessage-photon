@@ -1,0 +1,39 @@
+{
+  "name": "openclaw-imessage-photon",
+  "version": "0.1.0",
+  "description": "iMessage channel for OpenClaw via Photon Spectrum Cloud (no Mac required).",
+  "type": "module",
+  "license": "MIT",
+  "keywords": ["openclaw", "imessage", "photon", "spectrum", "channel"],
+  "author": "<your-github-username>",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/<your-github-username>/openclaw-imessage-photon.git"
+  },
+  "homepage": "https://github.com/<your-github-username>/openclaw-imessage-photon#readme",
+  "openclaw": {
+    "extensions": ["./dist/index.js"],
+    "setupEntry": "./dist/setup-entry.js",
+    "channel": {
+      "id": "imessage-photon",
+      "label": "iMessage (Photon)",
+      "selectionLabel": "iMessage via Photon Spectrum Cloud",
+      "detailLabel": "iMessage (Photon Cloud)",
+      "blurb": "Connect OpenClaw to iMessage through Photon Spectrum Cloud — no Mac or iMessage server required.",
+      "markdownCapable": false
+    }
+  },
+  "dependencies": {
+    "spectrum-ts": "^12.8.0"
+  },
+  "devDependencies": {
+    "@types/node": "^22",
+    "typescript": "^5"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json"
+  },
+  "peerDependencies": {
+    "openclaw": "*"
+  }
+}

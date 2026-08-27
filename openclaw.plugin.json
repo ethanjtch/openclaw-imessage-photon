@@ -1,0 +1,102 @@
+{
+  "id": "imessage-photon",
+  "name": "iMessage (Photon)",
+  "description": "iMessage channel via Photon Spectrum Cloud — no Mac required. Register at https://photon.codes, create a project, and paste the Project ID and Secret.",
+  "icon": "https://cdn.simpleicons.org/imessage",
+  "channels": ["imessage-photon"],
+  "channelEnvVars": {
+    "imessage-photon": [
+      "SPECTRUM_PROJECT_ID",
+      "SPECTRUM_PROJECT_SECRET",
+      "SPECTRUM_ALLOWED_NUMBERS"
+    ]
+  },
+  "configSchema": {
+    "type": "object",
+    "additionalProperties": false,
+    "properties": {}
+  },
+  "channelConfigs": {
+    "imessage-photon": {
+      "schema": {
+        "$schema": "http://json-schema.org/draft-07/schema#",
+        "type": "object",
+        "properties": {
+          "enabled": { "type": "boolean" },
+          "dmPolicy": {
+            "type": "string",
+            "enum": ["allowlist", "pairing", "open", "disabled"]
+          },
+          "dmSecurity": {
+            "type": "string",
+            "enum": ["allowlist", "pairing", "open", "disabled"]
+          },
+          "projectId": { "type": "string" },
+          "projectSecret": { "type": "string" },
+          "allowFrom": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Allowed sender phone numbers in E.164 form, e.g. +8613800138000. Empty = allow everyone."
+          },
+          "ackReaction": {
+            "type": "string",
+            "default": "👀",
+            "description": "Emoji reacted to inbound messages while the agent is processing. Empty string disables. Uses messages.ackReaction as fallback."
+          },
+          "tapbackNotifications": {
+            "type": "string",
+            "enum": ["off", "all"],
+            "default": "all",
+            "description": "off = ignore inbound tapbacks; all = forward them to the agent as system events."
+          },
+          "enableMedia": {
+            "type": "boolean",
+            "default": false,
+            "description": "Agent can send/receive media attachments (spectrum-ts native)."
+          },
+          "enablePoll": {
+            "type": "boolean",
+            "default": false,
+            "description": "Agent can create polls (spectrum-ts native)."
+          },
+          "enableEffects": {
+            "type": "boolean",
+            "default": false,
+            "description": "Agent can send full-screen effects (balloons, lasers, confetti, ...)."
+          },
+          "enableContact": {
+            "type": "boolean",
+            "default": false,
+            "description": "Agent can share contacts (vCard)."
+          },
+          "enableVoice": {
+            "type": "boolean",
+            "default": false,
+            "description": "Agent can send voice messages."
+          },
+          "enableGroups": {
+            "type": "boolean",
+            "default": false,
+            "description": "Handle group chats (spectrum-ts native). Requires inbound group routing; off by default."
+          },
+          "enableTyping": {
+            "type": "boolean",
+            "default": false,
+            "description": "Send typing indicators while the agent is processing."
+          },
+          "enableReadReceipts": {
+            "type": "boolean",
+            "default": false,
+            "description": "Mark inbound messages as read (read receipts)."
+          }
+        },
+        "additionalProperties": false
+      },
+      "uiHints": {
+        "projectId": { "label": "Photon project ID" },
+        "projectSecret": { "label": "Photon project secret", "sensitive": true },
+        "allowFrom": { "label": "Allowed phone numbers" }
+      }
+    }
+  }
+}
