@@ -16,6 +16,10 @@ agent processes).
   dispatch straight into the embedded agent runtime.
 - **No Mac required** — Photon Spectrum Cloud relays iMessage.
 - **Text, images, voice, polls, effects, contacts** — both directions.
+- **Rich link previews & Mini App cards** — send a URL as an iMessage link
+  card (`url`), a sheet-style Mini App card (`appUrl`, opens inside the
+  Spectrum App — no Safari jump), or a live in-transcript card (`appUrl` +
+  `appLive`).
 - **Voice transcription** — plug any `tools.media.audio` STT provider
   (Deepgram, ElevenLabs, Groq, ...) via ordinary OpenClaw config.
 - **Green-friendly defaults** — DM allowlist, seen-ack reaction, tapbacks,
@@ -85,6 +89,21 @@ iMessage provider, and copy the Project ID / Secret.
 | `enableTyping` | `false` | Typing indicator while processing |
 | `enableReadReceipts` | `false` | Mark inbound as read |
 
+### Rich links & Mini App cards
+
+Plain `send` accepts three URL flavors:
+
+| send param | iMessage rendering |
+|---|---|
+| `url` / `link` | Rich link preview card (tap opens in Safari) |
+| `appUrl` | Mini App card: compact title card; tap opens the full page in the Spectrum iMessage App — no Safari jump |
+| `appUrl` + `appLive: true` | Live card: interactive page rendered inline in the transcript (swipe/click, no tap-to-open) |
+
+App cards use Photon's **Spectrum App** host (Apple-approved iMessage
+launcher) — no business plan needed for `app()` cards; recipients install the
+Spectrum App once. Custom `customizedMiniApp()` (bring-your-own extension) is
+business-plan only.
+
 ### Voice transcription
 
 Configure any OpenClaw media-audio STT provider, e.g. Deepgram:
@@ -116,7 +135,7 @@ core media pipeline; the agent then sees the transcript.
 | Typing indicators | ✅ (`enableTyping`) | ✅ |
 | Read receipts | ✅ (`enableReadReceipts`) | ✅ |
 | Stickers / text animations | ❌ | ✅ (needs `@photon-ai/advanced-imessage`) |
-| Mini-app / status cards | ❌ (business-account only) | ✅ |
+| Mini-app / status cards | ✅ `appUrl`/`appLive` via send (Spectrum App host); custom `customizedMiniApp()` business-only | ✅ (needs `@photon-ai/advanced-imessage`) |
 | photonDoctor diagnostic tool | ❌ (use `openclaw channels status`) | ✅ |
 | Onboarding | manual credentials / env | device-code auto-provisioning |
 | License | **MIT** | UNLICENSED |
@@ -158,8 +177,10 @@ and `cp -r dist/*` there, or re-run `plugins install --force`.
       project via Photon's public API (no manual credential copying)
 - [ ] **Group mention gating**: `requireMention` config (only reply in groups
       when mentioned)
-- [ ] **Edit/unsend notifications**: `enableEditUnsend` switch (agent reacts
-      to inbound edit/unsend events)
+- [ ] **Plugin config schema**: declare plugin-owned `channels.imessage-photon.*`
+      keys via `configSchema` (blocked-ish today: openclaw's validator rejects
+      unknown keys, which is why extra switches like edit/unsend can't be added
+      without it)
 - [ ] Multi-account / remote iMessage line refinement
 
 ## License

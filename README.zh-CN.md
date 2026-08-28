@@ -9,6 +9,7 @@
 - **原生渠道插件** —— 运行于 OpenClaw gateway 进程内；消息直接进入内嵌 agent 运行时。
 - **无需 Mac** —— Photon Spectrum Cloud 中继 iMessage。
 - **文本、图片、语音、投票、特效、名片** —— 双向。
+- **富链接预览 & Mini App 卡片** —— 用 `url` 发链接卡片；用 `appUrl` 发 sheet 式 Mini App 卡片（在 Spectrum App 内打开，不跳 Safari）；用 `appUrl` + `appLive` 发 live 卡片（对话内直接交互）。
 - **语音转写** —— 通过普通 OpenClaw 配置接入任意 `tools.media.audio` 转录 provider（Deepgram、ElevenLabs、Groq……）。
 - **对用户友好的默认行为** —— DM 白名单、👀 已读反应、tapback、自动重连、已读回执、输入中指示。
 - **引导式配置向导** —— `openclaw onboard` 引导完成 Photon 项目配置（凭据通过 `SPECTRUM_PROJECT_ID` / `SPECTRUM_PROJECT_SECRET` 环境变量，或从控制台粘贴）。
@@ -74,6 +75,18 @@ openclaw gateway restart
 | `enableTyping` | `false` | 处理中显示输入中指示 |
 | `enableReadReceipts` | `false` | 入站消息标记已读 |
 
+### 富链接 & Mini App 卡片
+
+`send` 支持三种 URL 形态：
+
+| send 参数 | iMessage 渲染 |
+|---|---|
+| `url` / `link` | 富链接预览卡片（点击打开 Safari） |
+| `appUrl` | Mini App 卡片：紧凑标题卡片；点击在 Spectrum App 内打开完整页面——不跳 Safari |
+| `appUrl` + `appLive: true` | Live 卡片：页面内嵌在对话中直接交互（滑动/点击，无需点开） |
+
+App 卡片使用 Photon 的 **Spectrum App** 宿主（Apple 已批准的 iMessage 启动器）——`app()` 卡片**无需 business 套餐**；接收方装一次 Spectrum App 即可。自定义 `customizedMiniApp()`（自带扩展）才需要 business。
+
 ### 语音转写
 
 配置任一 OpenClaw 媒体音频转录 provider，例如 Deepgram：
@@ -103,7 +116,7 @@ openclaw gateway restart
 | 输入中指示 | ✅（`enableTyping`） | ✅ |
 | 已读回执 | ✅（`enableReadReceipts`） | ✅ |
 | 贴纸 / 文字动画 | ❌ | ✅（需 `@photon-ai/advanced-imessage`） |
-| mini-app / 状态卡片 | ❌（仅 business 账号） | ✅ |
+| mini-app / 状态卡片 | ✅ `appUrl`/`appLive`（通过 send，Spectrum App 宿主）；自定义 `customizedMiniApp()` 仅 business | ✅（需 `@photon-ai/advanced-imessage`） |
 | photonDoctor 诊断工具 | ❌（用 `openclaw channels status`） | ✅ |
 | 引导配置 | 手动凭据 / 环境变量 | 设备码自动开通 |
 | 许可证 | **MIT** | UNLICENSED |
@@ -133,7 +146,7 @@ systemctl --user restart openclaw-gateway
 - [ ] **测试文件**：config 解析 / inbound 分类 / 去重逻辑（防回归）
 - [ ] **设备码 onboarding**：调用 Photon 公开 API（app.photon.codes）自动登录 + 自动开通项目，免手动复制凭据
 - [ ] **群组 @ 门控**：`requireMention` 配置（群聊中只有被 @ 才回复）
-- [ ] **edit/unsend 通知 agent**：`enableEditUnsend` 开关（收到用户的编辑/撤回事件并回应）
+- [ ] **插件 config schema**：通过 `configSchema` 声明插件自有 `channels.imessage-photon.*` 配置键（当前 openclaw 校验器拒绝未知键，这正是 edit/unsend 等附加开关无法加入的原因）
 - [ ] multi-account / 远程 iMessage 线路支持细化
 
 ## 许可证
