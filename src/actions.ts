@@ -4,6 +4,7 @@ import type {
   ChannelMessageActionAdapter,
   ChannelMessageActionContext,
   ChannelMessageActionName,
+  ChannelMessageToolSchemaContribution,
 } from "openclaw/plugin-sdk/channel-contract";
 import { jsonResult } from "openclaw/plugin-sdk/agent-runtime";
 import { loadOutboundMediaFromUrl } from "openclaw/plugin-sdk/outbound-media";
@@ -11,6 +12,7 @@ import {
   text as textContent,
   markdown as markdownContent,
   richlink as richlinkContent,
+  app as appContent,
   attachment as attachmentContent,
   poll as pollContent,
   read as readContent,
@@ -226,23 +228,33 @@ export function createMessageActions(): ChannelMessageActionAdapter {
         mediaSourceParams: {
           sendAttachment: ["media", "mediaUrl", "filePath", "path", "file"],
         },
-        // Expose the rich-link capability on send: passing url/link sends an
-        // iMessage link-preview message (PHOTON richlink). Declared here so the
-        // agent schema shows url/link fields on send.
-        schema: {
-          properties: {
-            url: Type.String({
-              description:
-                "HTTPS URL to send as a rich link-preview message (iMessage renders it as a link card). Mutually exclusive with text/markdown.",
-            }),
-            link: Type.String({
-              description:
-                "Alias for url: HTTPS URL to send as a rich link-preview message.",
-            }),
-          },
-          actions: ["send"],
-          visibility: "current-channel",
-        },
+        // Expose rich-link and App-card capabilities on the shared send action.
+        schema: [
+          {
+            properties: {
+              url: Type.String({
+                description:
+                  "HTTPS URL to send as a rich link-preview message (iMessage renders it as a link card). Mutually exclusive with text/markdown/appUrl.",
+              }),
+              link: Type.String({
+                description:
+                  "Alias for url: HTTPS URL to send as a rich link-preview message.",
+              }),
+              appUrl: Type.String({
+                description:
+                  "HTTPS URL to send as a native iMessage App card (Spectrum App host). Recipient opens it in the Spectrum iMessage App without leaving Messages; degrades to a link preview on unsupported platforms. Mutually exclusive with text/markdown/url.",
+              }),
+              appLive: Type.Optional(
+                Type.Boolean({
+                  description:
+                    "When sending an App card (appUrl set), request live in-transcript rendering (MSMessageLiveLayout). Requires the recipient to have the Spectrum App extension installed.",
+                }),
+              ),
+            },
+            actions: ["send"],
+            visibility: "current-channel",
+          } as ChannelMessageToolSchemaContribution,
+        ],
       };
     },
     supportsAction: ({ action }) => SUPPORTED.has(action),
@@ -261,16 +273,22 @@ export function createMessageActions(): ChannelMessageActionAdapter {
           case "send": {
             const text = readString(params, "text", "message", "content");
             const url = readString(params, "url", "link");
-            const md = readString(params, "markdown", "md");
+            const appUrl = readString(params, "appUrl", "app_url", "cardUrl");
+            if (appUrl) {
+              const live = params.appLive === true || params.appLive === "true" || params.live === true || params.live === "true";
+              await space.send(appContent(appUrl, live ? { live: true } : undefined));
+              return actionOk({ to, type: "app", url: appUrl, live });
+            }
             if (url) {
               await space.send(richlinkContent(url));
               return actionOk({ to, type: "richlink", url });
             }
+            const md = readString(params, "markdown", "md");
             if (md) {
               await space.send(markdownContent(md));
               return actionOk({ to, type: "markdown" });
             }
-            if (!text) throw new Error("send requires text/message/content (or url/link, or markdown/md)");
+            if (!text) throw new Error("send requires text/message/content (or url/link, or appUrl)");
             await space.send(textContent(text));
             return actionOk({ to, type: "text" });
           }

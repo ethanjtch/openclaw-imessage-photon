@@ -90,8 +90,7 @@ export async function handleInbound(
   } else if (message.content.type === "poll" || message.content.type === "poll_option") {
     await dispatchPollEvent(runtime, cfg, space, message, account, log);
   } else if (message.content.type === "edit" || message.content.type === "unsend") {
-    // Agent-facing edit/unsend handling is opt-in (enableEditUnsend);
-    // until then, these are system events: log only.
+    // edit/unsend from the user are system events: log only (no agent turn).
     log?.(`[imessage-photon] system event type=${message.content.type} from ${space.id}`);
   } else {
     // System events (read, typing, contact, group ops, rename, ...) and any

@@ -192,6 +192,29 @@ export const imessagePhotonPlugin = createChatChannelPlugin<ResolvedAccount>({
       reply: true,
     },
     actions: createMessageActions(),
+    agentPrompt: {
+      // Text guidance layered on top of the fixed openclaw message-tool
+      // schema: keep replies as plain text by default, and only use
+      // reply-quoting when the user themselves quoted a message.
+      messageToolHints: ({ cfg }) => {
+        const account = resolveAccount(cfg);
+        const hints = [
+          "Prefer plain text (text) over markdown (markdown) unless the recipient explicitly asked for rich formatting. Plain text renders best in iMessage.",
+          "For everyday replies use the plain send action without quotes.",
+        ];
+        if (account.enableMedia) {
+          hints.push("Images/audio/video/files are sent with sendAttachment (media/buffer/filePath).");
+        }
+        return hints;
+      },
+      inboundFormattingHints: () => ({
+        text_markup: "plain text",
+        rules: [
+          "When the user's message is a reply-to (quoted) message, reply by quoting that message back using the reply action with its messageId — this keeps the quoted conversation thread visible in iMessage.",
+          "When the user's message is NOT a reply, reply with a plain send (no quote).",
+        ],
+      }),
+    },
     setupWizard,
     config: {
       listAccountIds: () => ["default"],
