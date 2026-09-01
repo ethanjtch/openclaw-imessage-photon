@@ -122,11 +122,16 @@ async function runAgentTurn(
   },
 ): Promise<void> {
   const phone = senderPhone(space, message) ?? space.id;
-  const rawSenderName = (message as unknown as { sender?: { name?: string } }).sender?.name;
-  // Conversation display name: keep a real contact name if the platform delivers
-  // one, otherwise derive a friendly label from the phone number so the session
-  // shows "iMessage 6803" (last 4 digits) instead of the raw E.164 number.
-  const senderName = rawSenderName?.trim() ? rawSenderName : `iMessage ${phone.slice(-4)}`;
+  // Sender display name, separate from the conversation label:
+  // 1. explicit per-number contact name from config (contactNames) — bubbles show
+  //    this instead of a phone-derived label, e.g. "Ethan".
+  // 2. any real name the platform delivers (spectrum currently never sends one).
+  // 3. stable fallback "iMessage <last4 digits>" so the label never fluctuates.
+  const platformName = (message as unknown as { sender?: { name?: string } }).sender?.name;
+  const senderName = account.contactNames[phone] ?? platformName?.trim() ?? `iMessage ${phone.slice(-4)}`;
+  // Conversation title stays a stable, human-meaningful label independent of the
+  // per-message sender display name.
+  const conversationLabel = `iMessage ${phone.slice(-4)}`;
 
   // Read receipt: mark the conversation read (iMessage marks the whole chat).
   if (account.enableReadReceipts) {
@@ -174,6 +179,7 @@ async function runAgentTurn(
 
   await runtime.inbound.run({
     channel: CHANNEL,
+    accountId: "default",
     raw: message,
     adapter: {
       ingest: (raw: Message) => ({
@@ -204,9 +210,10 @@ async function runAgentTurn(
         });
         const ctxPayload = await runtime.inbound.buildContext({
           channel: CHANNEL,
+          accountId: "default",
           from: phone,
           sender: { id: phone, name: senderName },
-          conversation: { kind: "direct", id: space.id, label: senderName },
+          conversation: { kind: "direct", id: space.id, label: conversationLabel },
           route: { agentId: AGENT_ID, routeSessionKey },
           reply: { to: phone, sourceReplyDeliveryMode: "reply" },
           message: { rawBody: opts.rawText, bodyForAgent: opts.textForAgent },

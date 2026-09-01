@@ -3,7 +3,9 @@
   "name": "iMessage (Photon)",
   "description": "iMessage channel via Photon Spectrum Cloud — no Mac required. Register at https://photon.codes, create a project, and paste the Project ID and Secret.",
   "icon": "https://cdn.simpleicons.org/imessage",
-  "channels": ["imessage-photon"],
+  "channels": [
+    "imessage-photon"
+  ],
   "channelEnvVars": {
     "imessage-photon": [
       "SPECTRUM_PROJECT_ID",
@@ -22,20 +24,38 @@
         "$schema": "http://json-schema.org/draft-07/schema#",
         "type": "object",
         "properties": {
-          "enabled": { "type": "boolean" },
+          "enabled": {
+            "type": "boolean"
+          },
           "dmPolicy": {
             "type": "string",
-            "enum": ["allowlist", "pairing", "open", "disabled"]
+            "enum": [
+              "allowlist",
+              "pairing",
+              "open",
+              "disabled"
+            ]
           },
           "dmSecurity": {
             "type": "string",
-            "enum": ["allowlist", "pairing", "open", "disabled"]
+            "enum": [
+              "allowlist",
+              "pairing",
+              "open",
+              "disabled"
+            ]
           },
-          "projectId": { "type": "string" },
-          "projectSecret": { "type": "string" },
+          "projectId": {
+            "type": "string"
+          },
+          "projectSecret": {
+            "type": "string"
+          },
           "allowFrom": {
             "type": "array",
-            "items": { "type": "string" },
+            "items": {
+              "type": "string"
+            },
             "description": "Allowed sender phone numbers in E.164 form, e.g. +8613800138000. Empty = allow everyone."
           },
           "ackReaction": {
@@ -45,7 +65,10 @@
           },
           "tapbackNotifications": {
             "type": "string",
-            "enum": ["off", "all"],
+            "enum": [
+              "off",
+              "all"
+            ],
             "default": "all",
             "description": "off = ignore inbound tapbacks; all = forward them to the agent as system events."
           },
@@ -88,14 +111,28 @@
             "type": "boolean",
             "default": false,
             "description": "Mark inbound messages as read (read receipts)."
+          },
+          "contactNames": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Map of E.164 phone numbers to human-readable display names shown as the message sender in conversation bubbles, e.g. {\"+8613800138000\": \"Ethan\"}. Falls back to \"iMessage <last4 digits>\" and then to any name provided by the platform."
           }
         },
         "additionalProperties": false
       },
       "uiHints": {
-        "projectId": { "label": "Photon project ID" },
-        "projectSecret": { "label": "Photon project secret", "sensitive": true },
-        "allowFrom": { "label": "Allowed phone numbers" }
+        "projectId": {
+          "label": "Photon project ID"
+        },
+        "projectSecret": {
+          "label": "Photon project secret",
+          "sensitive": true
+        },
+        "allowFrom": {
+          "label": "Allowed phone numbers"
+        }
       }
     }
   }

@@ -29,6 +29,8 @@ export type ResolvedAccount = {
   enableGroups: boolean;
   enableTyping: boolean;
   enableReadReceipts: boolean;
+  /** Optional per-number display names: {"+8613800138000": "Ethan"}. */
+  contactNames: Record<string, string>;
 };
 
 function channelSection(cfg: OpenClawConfig): Record<string, unknown> | undefined {
@@ -68,6 +70,7 @@ export function resolveAccount(cfg: OpenClawConfig, accountId?: string | null): 
     enableGroups: Boolean(section?.enableGroups),
     enableTyping: Boolean(section?.enableTyping),
     enableReadReceipts: Boolean(section?.enableReadReceipts),
+    contactNames: (section?.contactNames as Record<string, string> | undefined) ?? {},
   };
 }
 
