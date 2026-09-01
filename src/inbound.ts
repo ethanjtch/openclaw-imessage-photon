@@ -21,7 +21,10 @@ export type ChannelRuntime = {
     buildAgentSessionKey: (params: {
       agentId: string;
       channel: string;
+      mainKey?: string;
       accountId?: string | null;
+      dmScope?: string;
+      identityLinks?: unknown;
       peer?: { kind: string; id: string } | null;
     }) => string;
   };
@@ -119,7 +122,11 @@ async function runAgentTurn(
   },
 ): Promise<void> {
   const phone = senderPhone(space, message) ?? space.id;
-  const senderName = (message as unknown as { sender?: { name?: string } }).sender?.name;
+  const rawSenderName = (message as unknown as { sender?: { name?: string } }).sender?.name;
+  // Conversation display name: keep a real contact name if the platform delivers
+  // one, otherwise derive a friendly label from the phone number so the session
+  // shows "iMessage 6803" (last 4 digits) instead of the raw E.164 number.
+  const senderName = rawSenderName?.trim() ? rawSenderName : `iMessage ${phone.slice(-4)}`;
 
   // Read receipt: mark the conversation read (iMessage marks the whole chat).
   if (account.enableReadReceipts) {
@@ -177,9 +184,19 @@ async function runAgentTurn(
         raw,
       }),
       resolveTurn: async (input: unknown) => {
+        // Pass the configured DM scope through so iMessage DMs get their own
+        // session (agent:main:imessage-photon:direct:<phone>) instead of being
+        // merged into the main session (agent:main:main). The default
+        // dmScope in core is "main"; without this, every channel merges.
+        const s = cfg.session as
+          | { mainKey?: string; dmScope?: string; identityLinks?: unknown }
+          | undefined;
         const routeSessionKey = runtime.routing.buildAgentSessionKey({
           agentId: AGENT_ID,
           channel: CHANNEL,
+          mainKey: s?.mainKey ?? "main",
+          dmScope: s?.dmScope ?? "main",
+          identityLinks: s?.identityLinks,
           peer: { kind: "direct", id: phone },
         });
         const storePath = runtime.session.resolveStorePath(cfg.session?.store, {
@@ -189,7 +206,7 @@ async function runAgentTurn(
           channel: CHANNEL,
           from: phone,
           sender: { id: phone, name: senderName },
-          conversation: { kind: "direct", id: space.id },
+          conversation: { kind: "direct", id: space.id, label: senderName },
           route: { agentId: AGENT_ID, routeSessionKey },
           reply: { to: phone, sourceReplyDeliveryMode: "reply" },
           message: { rawBody: opts.rawText, bodyForAgent: opts.textForAgent },
@@ -203,6 +220,23 @@ async function runAgentTurn(
           storePath,
           ctxPayload,
           recordInboundSession: runtime.session.recordInboundSession,
+          // openclaw ≥ 2026.8.1 requires prepared turns to declare a dispatch
+          // lifecycle: turnAdoptionLifecycle is undefined for this non-durable
+          // direct-DM turn; onDispatchSkipped releases what runDispatch would
+          // have settled (typing indicator + seen-ack) when dispatch is
+          // skipped (outboundEcho / botLoopProtection / observeOnly).
+          runDispatchLifecycle: {
+            turnAdoptionLifecycle: undefined,
+            onDispatchSkipped: async () => {
+              await stopTyping();
+              if (ackHandle) {
+                const h = ackHandle as unknown as { remove: () => Promise<void> };
+                await h.remove().catch((err: unknown) =>
+                  log?.(`[imessage-photon] ack remove failed (skipped): ${String(err)}`),
+                );
+              }
+            },
+          },
           runDispatch: () =>
             runtime.reply.dispatchReplyWithBufferedBlockDispatcher({
               ctx: ctxPayload,

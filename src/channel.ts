@@ -231,6 +231,20 @@ export const imessagePhotonPlugin = createChatChannelPlugin<ResolvedAccount>({
         };
       },
     },
+    // Directory: give iMessage contacts a friendly display name so sessions
+    // show "iMessage <last4>" instead of the raw E.164 number.
+    directory: {
+      listPeers: async ({ cfg }) => {
+        const account = resolveAccount(cfg);
+        const peers = account.allowFrom ?? [];
+        return peers.map((raw) => {
+          const id = String(raw).trim();
+          if (!id) return null;
+          const tail = id.slice(-4);
+          return { kind: "user", id, name: `iMessage ${tail}` };
+        }).filter((e): e is { kind: "user"; id: string; name: string } => e !== null);
+      },
+    },
     setup: {
       applyAccountConfig: ({ cfg, input }) => ({
         ...cfg,
