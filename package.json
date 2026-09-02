@@ -1,6 +1,6 @@
 {
   "name": "openclaw-imessage-photon",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "iMessage channel for OpenClaw via Photon Spectrum Cloud (no Mac required).",
   "type": "module",
   "license": "MIT",
