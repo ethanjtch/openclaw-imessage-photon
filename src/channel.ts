@@ -3,7 +3,7 @@ import {
   type OpenClawConfig,
 } from "openclaw/plugin-sdk/channel-core";
 import type { ChannelSetupWizard } from "openclaw/plugin-sdk/channel-setup";
-import { connectSpectrum, resetSpectrum, rememberSpace, rememberMessage } from "./spectrum.js";
+import { connectSpectrum, resetSpectrum, rememberSpace, rememberMessage, resolveOrOpenSpace, sendText } from "./spectrum.js";
 import { handleInbound, type ChannelRuntime } from "./inbound.js";
 import { createMessageActions } from "./actions.js";
 
@@ -310,9 +310,20 @@ export const imessagePhotonPlugin = createChatChannelPlugin<ResolvedAccount>({
   },
   threading: { topLevelReplyToMode: "reply" },
   outbound: {
-    // Outbound delivery runs inside the gateway via our message actions
-    // (handleAction). Declaring deliveryMode "gateway" makes the shared
-    // message tool treat this channel as send-capable.
-    deliveryMode: "gateway",
+    // Real active-outbound surface: lets the core deliver proactive sends
+    // (cron announcements, heartbeat, control-UI new message) to iMessage via
+    // Spectrum. sendText resolves/creates the 1:1 Space by phone number.
+    deliveryMode: "direct",
+    sendText: async ({ to, text }) => {
+      const space = await resolveOrOpenSpace(to);
+      if (!space) throw new Error(`imessage-photon: no reachable space for ${to}`);
+      await sendText(space, text);
+      return {
+        channel: "imessage-photon",
+        messageId: "",
+        target: { kind: "conversation" as const, id: to },
+        timestamp: Date.now(),
+      };
+    },
   },
 });

@@ -44,6 +44,30 @@ export function resolveSpace(target: string): Space | undefined {
   return spacesByPhone.get(phone);
 }
 
+/**
+ * Resolve a Space for an outbound target, falling back to resolving/creating
+ * the 1:1 conversation via the platform when the target was never observed on
+ * the inbound stream (active outbound sends).
+ */
+export async function resolveOrOpenSpace(target: string): Promise<Space | undefined> {
+  const cached = resolveSpace(target);
+  if (cached) return cached;
+  const explicitPhone = normalizePhone(target);
+  if (!explicitPhone || !app) return undefined;
+  try {
+    const namespace = (app as unknown as { space?: Record<string, unknown> }).space;
+    const create =
+      (namespace?.["imessage"] as unknown as { create?: (user: string) => Promise<Space> | undefined } | undefined)
+        ?.create;
+    if (!create) return undefined;
+    const space = await create(explicitPhone);
+    if (space) rememberSpace(space);
+    return space;
+  } catch {
+    return undefined;
+  }
+}
+
 /** Number of known spaces (used in diagnostics). */
 export function knownSpaceCount(): number {
   return spacesByPhone.size;
